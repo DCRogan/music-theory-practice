@@ -2,6 +2,7 @@ import { useReducer, useEffect } from 'react'
 import { generateQuestion } from './logic/questionGenerator'
 import HUD from './components/HUD'
 import QuestionCard from './components/QuestionCard'
+import AnswerGrid from './components/AnswerGrid'
 
 const initialState = {
   modeId: 'mode1',
@@ -70,18 +71,12 @@ export default function App() {
         onModeChange={handleModeChange}
       />
       <QuestionCard question={state.question} />
-      {state.question.options.map(opt => (
-        <button key={opt} onClick={() => handleSelect(opt)}
-          style={{
-            margin: '0.5rem', padding: '1rem 2rem',
-            background: state.selected === opt
-              ? (opt === state.question.answer ? '#2d6a3f' : '#6a2d2d')
-              : state.status !== 'idle' && opt === state.question.answer ? '#7a5a10' : '#333',
-            color: 'white', borderRadius: '6px',
-          }}>
-          {opt}
-        </button>
-      ))}
+      <AnswerGrid
+        question={state.question}
+        selected={state.selected}
+        status={state.status}
+        onSelect={handleSelect}
+      />
     </div>
   )
 }
