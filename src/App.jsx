@@ -1,6 +1,7 @@
 import { useReducer, useEffect } from 'react'
 import { generateQuestion } from './logic/questionGenerator'
 import HUD from './components/HUD'
+import QuestionCard from './components/QuestionCard'
 
 const initialState = {
   modeId: 'mode1',
@@ -68,7 +69,7 @@ export default function App() {
         streak={state.streak}
         onModeChange={handleModeChange}
       />
-      <pre style={{ fontSize: '0.7rem' }}>{JSON.stringify(state.question.prompt, null, 2)}</pre>
+      <QuestionCard question={state.question} />
       {state.question.options.map(opt => (
         <button key={opt} onClick={() => handleSelect(opt)}
           style={{
