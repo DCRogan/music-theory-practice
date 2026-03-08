@@ -1,8 +1,10 @@
 import { useReducer, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { generateQuestion } from './logic/questionGenerator'
 import HUD from './components/HUD'
 import QuestionCard from './components/QuestionCard'
 import AnswerGrid from './components/AnswerGrid'
+import './App.css'
 
 const initialState = {
   modeId: 'mode1',
@@ -62,21 +64,42 @@ export default function App() {
   if (!state.question) return null
 
   return (
-    <div style={{ padding: '1rem', color: 'white' }}>
-      <HUD
-        modeId={state.modeId}
-        score={state.score}
-        total={state.total}
-        streak={state.streak}
-        onModeChange={handleModeChange}
-      />
-      <QuestionCard question={state.question} />
-      <AnswerGrid
-        question={state.question}
-        selected={state.selected}
-        status={state.status}
-        onSelect={handleSelect}
-      />
+    <div className="app">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ width: '100%' }}
+      >
+        <HUD
+          modeId={state.modeId}
+          score={state.score}
+          total={state.total}
+          streak={state.streak}
+          onModeChange={handleModeChange}
+        />
+      </motion.div>
+
+      <div className="app__body">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={state.question.modeId + JSON.stringify(state.question.prompt)}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}
+          >
+            <QuestionCard question={state.question} />
+            <AnswerGrid
+              question={state.question}
+              selected={state.selected}
+              status={state.status}
+              onSelect={handleSelect}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
