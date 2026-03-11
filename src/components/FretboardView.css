@@ -1,0 +1,207 @@
+.fretboard-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  padding: 1rem 0.5rem 1.5rem;
+  gap: 1.25rem;
+}
+
+/* Target note display */
+.fretboard-view__target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.fretboard-view__target-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+.fretboard-view__target-note {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+/* Score line */
+.fretboard-view__score {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  min-height: 1.2em;
+}
+.fretboard-view__score span { color: var(--accent); }
+
+/* Fretboard container — horizontally scrollable on small screens */
+.fretboard-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fretboard {
+  display: flex;
+  flex-direction: column;
+  min-width: 520px;
+  padding: 0 0.5rem;
+  position: relative;
+}
+
+/* Fret number row */
+.fret-numbers {
+  display: grid;
+  grid-template-columns: 28px repeat(13, 1fr);
+  margin-bottom: 4px;
+}
+.fret-number {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+}
+.fret-number.marker { color: var(--accent); }
+
+/* Each string row */
+.string-row {
+  display: grid;
+  grid-template-columns: 28px repeat(13, 1fr);
+  align-items: center;
+  height: 44px;
+  position: relative;
+}
+
+/* The horizontal string line */
+.string-row::after {
+  content: '';
+  position: absolute;
+  left: 28px;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Thicker for lower strings */
+.string-row:nth-child(6)::after  { height: 3px; background: #3a3a3e; }
+.string-row:nth-child(5)::after  { height: 2.5px; background: #363639; }
+.string-row:nth-child(4)::after  { height: 2px; background: #323235; }
+.string-row:nth-child(3)::after  { height: 1.5px; background: #2e2e31; }
+
+.string-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-align: right;
+  padding-right: 8px;
+  z-index: 1;
+}
+
+/* Fret dot (clickable position) */
+.fret-dot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  cursor: pointer;
+}
+
+.fret-dot__inner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--bg-option);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: transparent;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.1s ease;
+}
+
+.fret-dot:hover .fret-dot__inner {
+  border-color: var(--text-dim);
+  transform: scale(1.1);
+}
+
+/* Selected by user (before reveal) */
+.fret-dot.selected .fret-dot__inner {
+  background: rgba(232,168,56,0.25);
+  border-color: var(--accent);
+}
+
+/* After reveal states */
+.fret-dot.hit .fret-dot__inner {
+  background: var(--correct-bg);
+  border-color: var(--correct);
+  color: #a8d5b0;
+  font-size: 0.55rem;
+}
+.fret-dot.miss .fret-dot__inner {
+  background: rgba(232,168,56,0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-size: 0.55rem;
+}
+.fret-dot.wrong .fret-dot__inner {
+  background: var(--wrong-bg);
+  border-color: var(--wrong);
+  color: #e08880;
+  font-size: 0.55rem;
+}
+
+/* Fret dividers */
+.fret-dot::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--border);
+  z-index: 0;
+}
+/* Nut (fret 0 left border) — handled by open string column */
+.fret-dot:first-of-type::before { display: none; }
+
+/* Action buttons */
+.fretboard-view__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.fretboard-action-btn {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.6rem 1.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-option);
+  color: var(--text);
+  transition: all 0.15s ease;
+}
+.fretboard-action-btn:hover {
+  border-color: var(--text-dim);
+  transform: translateY(-1px);
+}
+.fretboard-action-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0d0d0f;
+}
+.fretboard-action-btn.primary:hover {
+  background: #f0b840;
+}
