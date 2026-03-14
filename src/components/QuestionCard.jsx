@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import './QuestionCard.css'
 
 const CONDITION_LABELS = {
@@ -13,7 +14,7 @@ const ANSWER_LABELS = {
   semitone: '选出半音数',
 }
 
-export default function QuestionCard({ question }) {
+function QuestionCard({ question }) {
   const { prompt, answerType } = question
   const isTwoNote = 'target' in prompt
   const isSoloInterval = prompt.conditionType === 'intervalToSemitone'
@@ -69,3 +70,5 @@ export default function QuestionCard({ question }) {
     </div>
   )
 }
+
+export default memo(QuestionCard)

@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import './OptionButton.css'
 
-export default function OptionButton({ option, status, isCorrect, isSelected, onClick }) {
+function OptionButton({ option, status, isCorrect, isSelected, onClick }) {
   let className = 'option-btn'
   let disabled = false
   let showHint = false
@@ -23,3 +24,5 @@ export default function OptionButton({ option, status, isCorrect, isSelected, on
     </button>
   )
 }
+
+export default memo(OptionButton)

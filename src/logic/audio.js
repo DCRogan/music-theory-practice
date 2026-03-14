@@ -3,6 +3,10 @@
 
 let audioCtx = null
 
+// Track active master gain nodes to limit polyphony
+const activeNotes = []
+const MAX_POLYPHONY = 6
+
 function getAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)()
@@ -27,6 +31,16 @@ export function playFret(string, fret) {
   const freq = fretFrequency(string, fret)
   const now = ctx.currentTime
 
+  // Enforce polyphony limit: fade out oldest note if at max
+  if (activeNotes.length >= MAX_POLYPHONY) {
+    const oldest = activeNotes.shift()
+    try {
+      oldest.gain.setTargetAtTime(0, now, 0.02)
+    } catch {
+      // node may already be disconnected
+    }
+  }
+
   // Master gain for this note
   const masterGain = ctx.createGain()
   masterGain.gain.setValueAtTime(0.28, now)
@@ -35,6 +49,13 @@ export function playFret(string, fret) {
   masterGain.gain.exponentialRampToValueAtTime(0.12, now + 0.08)
   masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8)
   masterGain.connect(ctx.destination)
+
+  activeNotes.push(masterGain)
+  // Clean up reference after note fully decays
+  setTimeout(() => {
+    const idx = activeNotes.indexOf(masterGain)
+    if (idx !== -1) activeNotes.splice(idx, 1)
+  }, 2000)
 
   // Harmonics: fundamental + overtones with decreasing amplitude
   const harmonics = [

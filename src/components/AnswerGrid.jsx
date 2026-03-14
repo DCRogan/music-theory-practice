@@ -1,7 +1,9 @@
+import { memo, useCallback } from 'react'
 import './AnswerGrid.css'
 import OptionButton from './OptionButton'
 
-export default function AnswerGrid({ question, selected, status, onSelect }) {
+function AnswerGrid({ question, selected, status, onSelect }) {
+  const handleClick = useCallback(opt => onSelect(opt), [onSelect])
   return (
     <div className="answer-grid">
       {question.options.map(opt => (
@@ -11,9 +13,11 @@ export default function AnswerGrid({ question, selected, status, onSelect }) {
           status={status}
           isCorrect={opt === question.answer}
           isSelected={opt === selected}
-          onClick={() => onSelect(opt)}
+          onClick={() => handleClick(opt)}
         />
       ))}
     </div>
   )
 }
+
+export default memo(AnswerGrid)

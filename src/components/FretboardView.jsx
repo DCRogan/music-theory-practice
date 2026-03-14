@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { noteAtFret, allPositions, randomNote, FRET_COUNT } from '../logic/fretboard'
 import { playFret } from '../logic/audio'
 import './FretboardView.css'
@@ -42,14 +42,35 @@ function stringY(s) {
   return TOP_PADDING + s * STRING_SPACING
 }
 
+// Dot fill colors by interaction state (module-level constant, never recreated)
+const DOT_FILL = {
+  idle:     'transparent',
+  selected: 'rgba(232,168,56,0.55)',
+  hit:      '#3d7a52',
+  miss:     'rgba(232,168,56,0.30)',
+  wrong:    '#7a2e2a',
+}
+
+// Dot stroke colors by interaction state
+const DOT_STROKE = {
+  idle:     'rgba(255,255,255,0.0)',
+  selected: '#e8a838',
+  hit:      '#5a9e6f',
+  miss:     '#e8a838',
+  wrong:    '#c04a42',
+}
+
 export default function FretboardView() {
   const [targetNote, setTargetNote] = useState(() => randomNote())
   const [selected, setSelected] = useState(new Set())
   const [revealed, setRevealed] = useState(false)
   const [stats, setStats] = useState({ found: 0, total: 0, wrong: 0 })
 
-  const correctPositions = allPositions(targetNote)
-  const correctKeys = new Set(correctPositions.map(([s, f]) => `${s}-${f}`))
+  const correctPositions = useMemo(() => allPositions(targetNote), [targetNote])
+  const correctKeys = useMemo(
+    () => new Set(correctPositions.map(([s, f]) => `${s}-${f}`)),
+    [correctPositions]
+  )
 
   function toggleSelect(s, f) {
     if (revealed) return
@@ -87,22 +108,6 @@ export default function FretboardView() {
     if (isSelected && !isCorrect) return 'wrong'
     if (!isSelected && isCorrect) return 'miss'
     return 'idle'
-  }
-
-  // Dot color by state
-  const DOT_FILL = {
-    idle:     'transparent',
-    selected: 'rgba(232,168,56,0.55)',
-    hit:      '#3d7a52',
-    miss:     'rgba(232,168,56,0.30)',
-    wrong:    '#7a2e2a',
-  }
-  const DOT_STROKE = {
-    idle:     'rgba(255,255,255,0.0)',
-    selected: '#e8a838',
-    hit:      '#5a9e6f',
-    miss:     '#e8a838',
-    wrong:    '#c04a42',
   }
 
   return (

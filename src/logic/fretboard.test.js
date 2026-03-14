@@ -21,3 +21,54 @@ describe('allPositions', () => {
   it('C has positions', () => expect(allPositions('C').length).toBeGreaterThan(0))
   it('F# has positions', () => expect(allPositions('F#').length).toBeGreaterThan(0))
 })
+
+describe('allPositions - enharmonic support', () => {
+  it('Bb returns same positions as A#', () => {
+    const bb = allPositions('Bb')
+    const aSharp = allPositions('A#')
+    expect(bb.length).toBeGreaterThan(0)
+    expect(bb).toEqual(aSharp)
+  })
+
+  it('Eb returns same positions as D#', () => {
+    const eb = allPositions('Eb')
+    const dSharp = allPositions('D#')
+    expect(eb.length).toBeGreaterThan(0)
+    expect(eb).toEqual(dSharp)
+  })
+
+  it('Gb returns same positions as F#', () => {
+    const gb = allPositions('Gb')
+    const fSharp = allPositions('F#')
+    expect(gb.length).toBeGreaterThan(0)
+    expect(gb).toEqual(fSharp)
+  })
+
+  it('Db returns same positions as C#', () => {
+    const db = allPositions('Db')
+    const cSharp = allPositions('C#')
+    expect(db.length).toBeGreaterThan(0)
+    expect(db).toEqual(cSharp)
+  })
+
+  it('Ab returns same positions as G#', () => {
+    const ab = allPositions('Ab')
+    const gSharp = allPositions('G#')
+    expect(ab.length).toBeGreaterThan(0)
+    expect(ab).toEqual(gSharp)
+  })
+
+  it('E# returns same positions as F', () => {
+    const eSharp = allPositions('E#')
+    const f = allPositions('F')
+    expect(eSharp.length).toBeGreaterThan(0)
+    expect(eSharp).toEqual(f)
+  })
+
+  it('Cb returns same positions as B', () => {
+    const cb = allPositions('Cb')
+    const b = allPositions('B')
+    expect(cb.length).toBeGreaterThan(0)
+    expect(cb).toEqual(b)
+  })
+})

@@ -1,0 +1,48 @@
+.mode-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mode-selector__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mode-selector__group-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding-left: 0.25rem;
+}
+
+.mode-selector__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.mode-chip {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0.7rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  background: transparent;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.mode-chip:hover { color: var(--text); border-color: var(--text-dim); }
+.mode-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0d0d0f;
+  font-weight: 600;
+}
