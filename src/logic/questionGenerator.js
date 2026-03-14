@@ -1,21 +1,23 @@
 import { NOTES, INTERVALS, SOLFEGE, noteAt, semitonesBetween, intervalName, solfegeName } from './musicTheory'
 
 export const MODES = [
-  { id: 'mode1', label: '根音+音程→音名',  group: 'single' },
-  { id: 'mode2', label: '根音+唱名→音名',  group: 'single' },
-  { id: 'mode3', label: '根音+半音→音名',  group: 'single' },
-  { id: 'mode4', label: '两音→音程名',     group: 'single' },
-  { id: 'mode5', label: '两音→唱名',       group: 'single' },
-  { id: 'mode6', label: '两音→半音数',     group: 'single' },
-  { id: 'mode7', label: '音程名→半音数',   group: 'single' },
-  { id: 'mode8', label: '半音数→音程名',   group: 'single' },
-  { id: 'mixA',  label: '混合A (1+2+3)',   group: 'mix' },
-  { id: 'mixB',  label: '混合B (4+5+6)',   group: 'mix' },
-  { id: 'mixC',  label: '混合C (7+8)',     group: 'mix' },
-  { id: 'full',  label: '全随机',          group: 'mix' },
+  { id: 'mode1',  label: '根音+音程→音名',  group: 'single' },
+  { id: 'mode2',  label: '根音+唱名→音名',  group: 'single' },
+  { id: 'mode3',  label: '根音+半音→音名',  group: 'single' },
+  { id: 'mode4',  label: '两音→音程名',     group: 'single' },
+  { id: 'mode5',  label: '两音→唱名',       group: 'single' },
+  { id: 'mode6',  label: '两音→半音数',     group: 'single' },
+  { id: 'mode7',  label: '音程名→半音数',   group: 'single' },
+  { id: 'mode8',  label: '半音数→音程名',   group: 'single' },
+  { id: 'mode9',  label: '唱名→半音数',     group: 'single' },
+  { id: 'mode10', label: '半音数→唱名',     group: 'single' },
+  { id: 'mixA',   label: '混合A (1+2+3)',   group: 'mix' },
+  { id: 'mixB',   label: '混合B (4+5+6)',   group: 'mix' },
+  { id: 'mixC',   label: '混合C (7~10)',    group: 'mix' },
+  { id: 'full',   label: '全随机',          group: 'mix' },
 ]
 
-const SINGLE_MODE_IDS = ['mode1','mode2','mode3','mode4','mode5','mode6','mode7','mode8']
+const SINGLE_MODE_IDS = ['mode1','mode2','mode3','mode4','mode5','mode6','mode7','mode8','mode9','mode10']
 const INTERVAL_NAMES = Object.values(INTERVALS)
 const SOLFEGE_DEGREES = Object.keys(SOLFEGE).map(Number)
 // semitone values that map to major scale degrees
@@ -83,17 +85,37 @@ function wrongIntervalSemitones(correct, count = 3) {
   return [...new Set(pool)].slice(0, count)
 }
 
-function makeQuestion(modeId) {
+function makeQuestion(modeId, allowDescending = false) {
   const root = rand(NOTES)
+  // When allowDescending is true, randomly pick a direction
+  const descending = allowDescending && Math.random() < 0.5
+  const direction = descending ? 'down' : 'up'
+
+  // Compute target note based on direction
+  function targetNote(rootNote, semi) {
+    const rootIdx = NOTES.indexOf(rootNote)
+    return descending
+      ? NOTES[(rootIdx - semi + 12 * 4) % 12]
+      : NOTES[(rootIdx + semi) % 12]
+  }
+
+  // Compute semitones between two notes based on direction
+  function semisBetween(rootNote, tgt) {
+    const rootIdx = NOTES.indexOf(rootNote)
+    const tgtIdx = NOTES.indexOf(tgt)
+    return descending
+      ? (rootIdx - tgtIdx + 12) % 12
+      : (tgtIdx - rootIdx + 12) % 12
+  }
 
   if (modeId === 'mode1') {
     const semi = rand(ALL_SEMITONES)
     const intName = INTERVALS[semi]
-    const answer = noteAt(root, semi)
+    const answer = targetNote(root, semi)
     const wrongs = wrongNotes(answer)
     return {
       modeId,
-      prompt: { root, condition: intName, conditionType: 'interval' },
+      prompt: { root, condition: intName, conditionType: 'interval', direction },
       answer,
       options: shuffle([answer, ...wrongs]),
       answerType: 'note',
@@ -103,11 +125,11 @@ function makeQuestion(modeId) {
   if (modeId === 'mode2') {
     const deg = rand(SOLFEGE_DEGREES)
     const semi = SOLFEGE[deg]
-    const answer = noteAt(root, semi)
+    const answer = targetNote(root, semi)
     const wrongs = wrongNotes(answer)
     return {
       modeId,
-      prompt: { root, condition: String(deg), conditionType: 'solfege' },
+      prompt: { root, condition: String(deg), conditionType: 'solfege', direction },
       answer,
       options: shuffle([answer, ...wrongs]),
       answerType: 'note',
@@ -116,11 +138,11 @@ function makeQuestion(modeId) {
 
   if (modeId === 'mode3') {
     const semi = Math.floor(Math.random() * 12) + 1
-    const answer = noteAt(root, semi)
+    const answer = targetNote(root, semi)
     const wrongs = wrongNotes(answer)
     return {
       modeId,
-      prompt: { root, condition: String(semi), conditionType: 'semitone' },
+      prompt: { root, condition: String(semi), conditionType: 'semitone', direction },
       answer,
       options: shuffle([answer, ...wrongs]),
       answerType: 'note',
@@ -129,12 +151,12 @@ function makeQuestion(modeId) {
 
   if (modeId === 'mode4') {
     const target = rand(NOTES)
-    const semi = semitonesBetween(root, target)
+    const semi = semisBetween(root, target)
     const answer = intervalName(semi)
     const wrongs = wrongIntervals(semi)
     return {
       modeId,
-      prompt: { root, target },
+      prompt: { root, target, direction },
       answer,
       options: shuffle([answer, ...wrongs]),
       answerType: 'interval',
@@ -143,12 +165,12 @@ function makeQuestion(modeId) {
 
   if (modeId === 'mode5') {
     const semi = rand(MAJOR_SEMITONES)
-    const target = noteAt(root, semi)
+    const target = targetNote(root, semi)
     const answer = solfegeName(semi)
     const wrongs = wrongSolfege(Number(answer))
     return {
       modeId,
-      prompt: { root, target },
+      prompt: { root, target, direction },
       answer,
       options: shuffle([answer, ...wrongs.map(String)]),
       answerType: 'solfege',
@@ -157,12 +179,12 @@ function makeQuestion(modeId) {
 
   if (modeId === 'mode6') {
     const semi = Math.floor(Math.random() * 12) + 1
-    const target = noteAt(root, semi)
+    const target = targetNote(root, semi)
     const answer = String(semi)
     const wrongs = wrongSemitones(semi).map(String)
     return {
       modeId,
-      prompt: { root, target },
+      prompt: { root, target, direction },
       answer,
       options: shuffle([answer, ...wrongs]),
       answerType: 'semitone',
@@ -198,13 +220,44 @@ function makeQuestion(modeId) {
     }
   }
 
+  if (modeId === 'mode9') {
+    // Given solfege degree -> select semitone count
+    const deg = rand(SOLFEGE_DEGREES)
+    const semi = SOLFEGE[deg]
+    const answer = String(semi)
+    const adjWrongs = wrongIntervalSemitones(semi).filter(s => MAJOR_SEMITONES.includes(s)).map(String)
+    const allWrongMajor = MAJOR_SEMITONES.filter(s => s !== semi).map(String)
+    const filledWrongs = [...new Set([...adjWrongs, ...shuffle(allWrongMajor)])].slice(0, 3)
+    return {
+      modeId,
+      prompt: { condition: String(deg), conditionType: 'solfegeToSemitone' },
+      answer,
+      options: shuffle([answer, ...filledWrongs]),
+      answerType: 'semitone',
+    }
+  }
+
+  if (modeId === 'mode10') {
+    // Given semitone count (major scale only) -> select solfege degree
+    const semi = rand(MAJOR_SEMITONES)
+    const answer = solfegeName(semi)
+    const wrongs = wrongSolfege(Number(answer))
+    return {
+      modeId,
+      prompt: { condition: String(semi), conditionType: 'semitoneToSolfege' },
+      answer,
+      options: shuffle([answer, ...wrongs.map(String)]),
+      answerType: 'solfege',
+    }
+  }
+
   return null
 }
 
-export function generateQuestion(modeId) {
-  if (modeId === 'mixA') return makeQuestion(rand(['mode1','mode2','mode3']))
-  if (modeId === 'mixB') return makeQuestion(rand(['mode4','mode5','mode6']))
-  if (modeId === 'mixC') return makeQuestion(rand(['mode7','mode8']))
-  if (modeId === 'full') return makeQuestion(rand(SINGLE_MODE_IDS))
-  return makeQuestion(modeId)
+export function generateQuestion(modeId, allowDescending = false) {
+  if (modeId === 'mixA') return makeQuestion(rand(['mode1','mode2','mode3']), allowDescending)
+  if (modeId === 'mixB') return makeQuestion(rand(['mode4','mode5','mode6']), allowDescending)
+  if (modeId === 'mixC') return makeQuestion(rand(['mode7','mode8','mode9','mode10']), allowDescending)
+  if (modeId === 'full') return makeQuestion(rand(SINGLE_MODE_IDS), allowDescending)
+  return makeQuestion(modeId, allowDescending)
 }

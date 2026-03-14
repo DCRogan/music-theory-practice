@@ -5,15 +5,15 @@
   width: 100%;
   flex: 1;
   padding: 1rem 0.5rem 1.5rem;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
-/* Target note display */
+/* Target note */
 .fretboard-view__target {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 .fretboard-view__target-label {
   font-size: 0.68rem;
@@ -33,155 +33,52 @@
 /* Score line */
 .fretboard-view__score {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-dim);
-  min-height: 1.2em;
 }
-.fretboard-view__score span { color: var(--accent); }
+.score-good { color: #5a9e6f; }
+.score-bad  { color: #c04a42; }
 
-/* Fretboard container — horizontally scrollable on small screens */
+/* Fretboard scroll container */
 .fretboard-scroll {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
 }
 
-.fretboard {
+/* SVG fretboard */
+.fretboard-svg {
+  display: block;
+  min-width: 740px;
+}
+
+/* Hover effect on idle dots via SVG class */
+.fret-hit-area {
+  transition: stroke 0.1s ease, fill 0.1s ease;
+}
+g:hover .fret-hit-area {
+  stroke: rgba(255,255,255,0.2);
+  fill: rgba(255,255,255,0.05);
+}
+
+/* Legend */
+.fretboard-legend {
   display: flex;
-  flex-direction: column;
-  min-width: 520px;
-  padding: 0 0.5rem;
-  position: relative;
-}
-
-/* Fret number row */
-.fret-numbers {
-  display: grid;
-  grid-template-columns: 28px repeat(13, 1fr);
-  margin-bottom: 4px;
-}
-.fret-number {
-  text-align: center;
+  gap: 1.2rem;
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--text-dim);
+  font-size: 0.7rem;
 }
-.fret-number.marker { color: var(--accent); }
-
-/* Each string row */
-.string-row {
-  display: grid;
-  grid-template-columns: 28px repeat(13, 1fr);
-  align-items: center;
-  height: 44px;
-  position: relative;
-}
-
-/* The horizontal string line */
-.string-row::after {
-  content: '';
-  position: absolute;
-  left: 28px;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--border);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Thicker for lower strings */
-.string-row:nth-child(6)::after  { height: 3px; background: #3a3a3e; }
-.string-row:nth-child(5)::after  { height: 2.5px; background: #363639; }
-.string-row:nth-child(4)::after  { height: 2px; background: #323235; }
-.string-row:nth-child(3)::after  { height: 1.5px; background: #2e2e31; }
-
-.string-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  text-align: right;
-  padding-right: 8px;
-  z-index: 1;
-}
-
-/* Fret dot (clickable position) */
-.fret-dot {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 44px;
-  cursor: pointer;
-}
-
-.fret-dot__inner {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: var(--bg-option);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: transparent;
-  transition: background 0.12s ease, border-color 0.12s ease, transform 0.1s ease;
-}
-
-.fret-dot:hover .fret-dot__inner {
-  border-color: var(--text-dim);
-  transform: scale(1.1);
-}
-
-/* Selected by user (before reveal) */
-.fret-dot.selected .fret-dot__inner {
-  background: rgba(232,168,56,0.25);
-  border-color: var(--accent);
-}
-
-/* After reveal states */
-.fret-dot.hit .fret-dot__inner {
-  background: var(--correct-bg);
-  border-color: var(--correct);
-  color: #a8d5b0;
-  font-size: 0.55rem;
-}
-.fret-dot.miss .fret-dot__inner {
-  background: rgba(232,168,56,0.15);
-  border-color: var(--accent);
-  color: var(--accent);
-  font-size: 0.55rem;
-}
-.fret-dot.wrong .fret-dot__inner {
-  background: var(--wrong-bg);
-  border-color: var(--wrong);
-  color: #e08880;
-  font-size: 0.55rem;
-}
-
-/* Fret dividers */
-.fret-dot::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 1px;
-  background: var(--border);
-  z-index: 0;
-}
-/* Nut (fret 0 left border) — handled by open string column */
-.fret-dot:first-of-type::before { display: none; }
+.legend-item       { color: var(--text-dim); }
+.legend-item.hit   { color: #5a9e6f; }
+.legend-item.miss  { color: #e8a838; }
+.legend-item.wrong { color: #c04a42; }
 
 /* Action buttons */
 .fretboard-view__actions {
   display: flex;
   gap: 0.75rem;
 }
-
 .fretboard-action-btn {
   font-family: var(--font-ui);
   font-size: 0.85rem;
@@ -192,6 +89,7 @@
   background: var(--bg-option);
   color: var(--text);
   transition: all 0.15s ease;
+  cursor: pointer;
 }
 .fretboard-action-btn:hover {
   border-color: var(--text-dim);

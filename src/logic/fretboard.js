@@ -23,7 +23,10 @@ export function allPositions(note) {
   return positions
 }
 
-// Returns a random note from NOTES
+// Natural notes only (no sharps/flats) for target note selection
+const NATURAL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+
+// Returns a random natural note
 export function randomNote() {
-  return NOTES[Math.floor(Math.random() * NOTES.length)]
+  return NATURAL_NOTES[Math.floor(Math.random() * NATURAL_NOTES.length)]
 }

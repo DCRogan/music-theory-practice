@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { generateQuestion, MODES } from './questionGenerator'
 
 describe('MODES', () => {
-  it('has 12 modes', () => expect(MODES).toHaveLength(12))
+  it('has 14 modes', () => expect(MODES).toHaveLength(14))
 })
 
 describe('generateQuestion', () => {
